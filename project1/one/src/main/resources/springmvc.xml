@@ -1,0 +1,64 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans.xsd
+	   http://www.springframework.org/schema/context
+	   http://www.springframework.org/schema/context/spring-context.xsd
+	   http://www.springframework.org/schema/mvc
+	   http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    <!--自动扫描-->
+    <context:component-scan base-package="com.controller"/>
+    <context:component-scan base-package="com.service"/>
+    <context:property-placeholder location="classpath:config.properties" />
+
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <!-- 初始化连接数量； -->
+        <property name="initialSize" value="0" />
+        <!-- 最大并发连接数 	-->
+        <property name="maxActive" value="20" />
+        <!-- 最大空闲连接数 -->
+        <property name="maxIdle" value="20" />
+        <!-- 最小空闲连接数 -->
+        <property name="minIdle" value="0" />
+        <!-- 最大等待时长 -->
+        <property name="maxWait" value="60000" />
+        <!-- 超过时间限制是否回收 -->
+        <property name="removeAbandoned" value="true" />
+        <!-- 超过时间限制多长； -->
+        <property name="removeAbandonedTimeout" value="180"/>
+        <!-- 数据源连接参数配置； -->
+        <property name="username" value="${db.username}"/>
+        <property name="url" value="${db.url}"/>
+        <property name="password" value="${db.password}"/>
+        <property name="driverClassName" value="${db.driver}"/>
+    </bean>
+    <!--配置sqlSessionFactory-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="mapperLocations">
+            <list>
+                <value>classpath:mapper/userMapper.xml</value>
+            </list>
+        </property>
+    </bean>
+    <!--<bean-->
+            <!--class="org.springframework.web.servlet.view.InternalResourceViewResolver">-->
+        <!--<property name="prefix">-->
+            <!--<value>/WEB-INF/jsp/</value>-->
+        <!--</property>-->
+        <!--<property name="suffix">-->
+            <!--<value>.jsp</value>-->
+        <!--</property>-->
+    <!--</bean>-->
+    <!--自动扫描mapper接口，自动注入sqlSessionFactory-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.dao"/>
+    </bean>
+    <!--&lt;!&ndash;配置事务管理&ndash;&gt;-->
+    <!--<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">-->
+        <!--<property name="dataSource" value="dataSource"/>-->
+    <!--</bean>-->
+    <mvc:annotation-driven/>
+    </beans>
